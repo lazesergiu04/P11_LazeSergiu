@@ -2,7 +2,7 @@
  * @description       : 
  * @author            : ChangeMeIn@UserSettingsUnder.SFDoc
  * @group             : 
- * @last modified on  : 07-29-2020
+ * @last modified on  : 07-31-2020
  * @last modified by  : ChangeMeIn@UserSettingsUnder.SFDoc
  * Modifications Log 
  * Ver   Date         Author                               Modification
@@ -11,26 +11,36 @@
 public with sharing class AccountTriggerHandler {
 
     public void deactivateAccounts (List<Order> orders)  {
-        Set<Id> accountsIdToDeactivate = new Set<Id>();
+        List<Account> accountsToDeactivate = new List<Account>();
+        Set<Id> accountsIdWithDeteledOrders = new Set<Id>();
         Set<Id> accountWithRemainingOrders = new Set<Id>();
+       
 
         //Add the AccountId of the order in a set
         for( Order currentOrder : orders){
             if( String.isNotBlank(currentOrder.AccountId)){
-                accountsIdToDeactivate.add(currentOrder.AccountId);
-            System.debug('Test');
+                accountsIdWithDeteledOrders.add(currentOrder.AccountId);
+            System.debug(accountsIdWithDeteledOrders + 'accountsID with deleted orders');
             }
         }
-        //Retrive the Accounts with orders
-        List<Account> accountsWithOrders = [Select Id From Account Where Id in :accountsIdToDeactivate];
-        List<Order> ordersWithAccountId = [Select AccountId, Id From Order Where AccountId in :accountsIdToDeactivate];
-        for(Order ord : ordersWithAccountId){
-
+        //Retrive the Accounts with orders 
+        List<Account> accountsWithOrders = [Select Id From Account Where Id in :accountsIdWithDeteledOrders];
+        //Retrive Orders with Account Id
+        List<Order> ordersWithAccountId = [Select AccountId, Id From Order Where AccountId in :accountsIdWithDeteledOrders];
+        
+        for (Order ord : ordersWithAccountId) {
+            accountWithRemainingOrders.add(ord.AccountId);
+            
         }
-
+        
         for(Account acc : accountsWithOrders){
+            if(!accountWithRemainingOrders.contains(acc.Id)){
+                acc.Active__c = 'false';
+                accountsToDeactivate.add(acc);
 
-        }
+            }
+
+        }update(accountsToDeactivate);
 
 
 
