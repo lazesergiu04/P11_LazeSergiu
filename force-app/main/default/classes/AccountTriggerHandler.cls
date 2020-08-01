@@ -10,7 +10,7 @@
 **/
 public with sharing class AccountTriggerHandler {
 
-    public void deactivateAccounts (List<Order> orders)  {
+    public static void deactivateAccounts (List<Order> orders)  {
         List<Account> accountsToDeactivate = new List<Account>();
         Set<Id> accountsIdWithDeteledOrders = new Set<Id>();
         Set<Id> accountWithRemainingOrders = new Set<Id>();
@@ -28,14 +28,15 @@ public with sharing class AccountTriggerHandler {
         //Retrive Orders with Account Id
         List<Order> ordersWithAccountId = [Select AccountId, Id From Order Where AccountId in :accountsIdWithDeteledOrders];
         
+        //Add the order Account id in a set to check the accounts with orders after deletion
         for (Order ord : ordersWithAccountId) {
             accountWithRemainingOrders.add(ord.AccountId);
             
         }
-        
+        //if the account id is not in the set with accounts that have orders, change the status of Active field
         for(Account acc : accountsWithOrders){
             if(!accountWithRemainingOrders.contains(acc.Id)){
-                acc.Active__c = 'false';
+               // acc.Active__c = 'false';
                 accountsToDeactivate.add(acc);
 
             }
