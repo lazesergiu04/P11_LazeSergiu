@@ -2,7 +2,7 @@
  * @description       : 
  * @author            : Sergiu Laze
  * @group             : 
- * @last modified on  : 05-08-2020
+ * @last modified on  : 20-08-2020
  * @last modified by  : Sergiu Laze
  * Modifications Log 
  * Ver   Date         Author                               Modification
@@ -36,7 +36,7 @@ public with sharing class AccountTriggerHandler {
         //if the account id is not in the set with accounts that have orders, change the status of Active field
         for(Account acc : accountsWithOrders){
             if(!accountWithRemainingOrders.contains(acc.Id)){
-                acc.Active__c = false;
+               // acc.Active__c = false;
                 accountsToDeactivate.add(acc);
 
             }
